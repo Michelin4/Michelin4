@@ -1,0 +1,91 @@
+Basic csv info: 
+(55713, 6)
+Index(['point_id', 'longitude', 'latitude', 'location', 'poi', 'poi_type'], dtype='object')
+     point_id   longitude   latitude            location  poi poi_type
+0   346300785 -118.302813  34.259466  Los Angeles County  pub  amenity
+1   437773582 -118.498483  34.029328  Los Angeles County  pub  amenity
+2   470868182 -118.255782  34.048469  Los Angeles County  pub  amenity
+3   902322554 -118.291931  34.102838  Los Angeles County  pub  amenity
+4  1028759192 -118.482601  34.000797  Los Angeles County  pub  amenity
+point_id     0
+longitude    0
+latitude     0
+location     0
+poi          0
+poi_type     0
+dtype: int64
+----------------------------------
+Counts unique:
+['Los Angeles County']
+['pub' 'college' 'library' 'school' 'university' 'bus_station' 'bank'
+ 'hospital' 'pharmacy' 'cinema' 'nightclub' 'atm' 'bar' 'office'
+ 'bus_stop' 'crossing' 'park' 'sports_centre' 'convenience' 'deli'
+ 'grocery' 'mall' 'supermarket' 'paved' 'attraction' 'hostel' 'hotel'
+ 'viewpoint']
+['amenity' 'building' 'highway' 'leisure' 'shop' 'surface' 'tourism']
+----------------------------------
+Changes in columns:
+Index(['point_id', 'longitude', 'latitude', 'poi', 'poi_type'], dtype='object')
+----------------------------------
+Counts:
+poi
+crossing         36329
+bus_stop         14490
+school             953
+convenience        630
+bank               577
+supermarket        449
+pharmacy           361
+bar                302
+atm                278
+viewpoint          239
+attraction         187
+library            167
+pub                107
+sports_centre       94
+park                93
+hotel               90
+cinema              67
+college             51
+bus_station         50
+nightclub           38
+hospital            36
+deli                30
+university          29
+hostel              23
+grocery             17
+paved               14
+mall                 8
+office               4
+Name: count, dtype: int64
+poi
+crossing         36329
+bus_stop         14490
+school             953
+convenience        630
+bank               577
+supermarket        449
+pharmacy           361
+bar                302
+atm                278
+viewpoint          239
+attraction         187
+library            167
+pub                107
+sports_centre       94
+park                93
+hotel               90
+cinema              67
+college             51
+bus_station         50
+nightclub           38
+hospital            36
+deli                30
+university          29
+hostel              23
+grocery             17
+paved               14
+mall                 8
+office               4
+Name: count, dtype: int64
+PS C:\Users\noamk> 
