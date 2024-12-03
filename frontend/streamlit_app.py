@@ -1,85 +1,236 @@
 import streamlit as st
 import os
+# %%
+from langchain.agents.agent_types import AgentType
+from langchain_experimental.agents import create_csv_agent
+from langchain.chat_models import ChatOpenAI
+from langchain.tools import tool
+import pandas as pd
+import numpy as np
+from geopy.distance import geodesic
+import geocoder
+import ast
+import folium
+import pandas as pd
+import webbrowser
+import streamlit.components.v1 as components
+class Map:
+    def __init__(self, data_point, zoom_start=13):
+        self.center = (data_point['LATITUDE'], data_point['LONGITUDE'])
+        self.zoom_start = zoom_start
 
-# App title
+        tiles = 'https://tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=yKizQwgQd53rog6n0kisnZ6OhqsNUzcMIhPKV7RLevpkLFUEfGrQbgW8SUl9GwKa'
+        attr = (
+            '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        )
+        self.map = folium.Map(location=self.center, zoom_start=self.zoom_start, tiles=tiles, attr=attr)
+
+        self.dict_color_poi = {
+            'highway': 'darkpurple',
+            'tourism': 'orange',
+            'shop': 'blue',
+            'amenity': 'green',
+            'surface': 'purple',
+            'leisure': 'pink',
+            'building': 'black',
+        }
+
+        self.dict_icons_poi = {  # From https://fontawesome.com/v4/icons/
+            'highway': 'road',
+            'tourism': 'suitcase',
+            'shop': 'shopping-bag',
+            'amenity': 'bath',
+            'surface': 'expand',
+            'leisure': 'gift',
+            'building': 'building',
+        }
+
+    def get_map_html(self):
+        """Save map to HTML and return its content."""
+        map_path = "map.html"
+        self.map.save(map_path)
+        with open(map_path, "r") as file:
+            return file.read()
+
+    def marker(self, point, icon='circle', color='red', popup=False):
+        lat, lon = point['LATITUDE'], point['LONGITUDE']
+        if popup:
+            injury_columns = ['FATAL', 'SERIOUS_INJURY', 'MINOR_INJURY', 'NO_INJURY']
+            injury_type = point[injury_columns][point[injury_columns] == 1.0].index[0]
+
+            person_involved = ['VH', 'CYC', 'PED']
+            pi_type = point[person_involved][point[person_involved] == 1.0].index[0]
+
+            popup_content = (
+                f"Latitude: {point['LATITUDE'].round(2)}<br>"
+                f"Longitude: {point['LONGITUDE'].round(2)}<br>"
+                f"Year: {int(point['YEAR'])}<br>"
+                f"Person Involved: {pi_type}<br>"
+                f"Injury: {injury_type}<br>"
+                f"POI Type: {point['nearest_poi_type']}<br>"
+                f"Distance to POI: {point['distance_to_poi'].round(2)}"
+            )
+
+            folium.Marker(
+                location=(lat, lon),
+                icon=folium.Icon(color=color, prefix='fa', icon=icon),
+                popup=folium.Popup(popup_content, min_width=300, max_width=300),
+            ).add_to(self.map)
+        else:
+            folium.Marker(
+                location=(lat, lon),
+                icon=folium.Icon(color=color, prefix='fa', icon=icon),
+            ).add_to(self.map)
+
+# Set Streamlit page configuration
 st.set_page_config(page_title="Michelin Tires Chatbot")
 
-# Replicate Credentials
+# Sidebar title
 with st.sidebar:
-    st.title('Michelin Tires Chatbot')
-    # if 'REPLICATE_API_TOKEN' in st.secrets:
-    #     st.success('API key already provided!', icon='✅')
-    #     replicate_api = st.secrets['REPLICATE_API_TOKEN']
-    # else:
-    #     replicate_api = st.text_input('Enter Replicate API token:', type='password')
-    #     if not (replicate_api.startswith('r8_') and len(replicate_api)==40):
-    #         st.warning('Please enter your credentials!', icon='⚠️')
-    #     else:
-    #         st.success('Proceed to entering your prompt message!', icon='👉')
-    # os.environ['REPLICATE_API_TOKEN'] = replicate_api
+    st.title("Michelin Tires Chatbot")
 
-    # st.subheader('Models and parameters')
-    # selected_model = st.sidebar.selectbox('Choose a Llama2 model', ['Llama2-7B', 'Llama2-13B'], key='selected_model')
-    # if selected_model == 'Llama2-7B':
-    #     llm = 'a16z-infra/llama7b-v2-chat:4f0a4744c7295c024a1de15e1a63c880d3da035fa1f49bfd344fe076074c8eea'
-    # elif selected_model == 'Llama2-13B':
-    #     llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'
-    # temperature = st.sidebar.slider('temperature', min_value=0.01, max_value=1.0, value=0.1, step=0.01)
-    # top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
-    # max_length = st.sidebar.slider('max_length', min_value=20, max_value=80, value=50, step=5)
-    # st.markdown('📖 Learn how to build this app in this [blog](https://blog.streamlit.io/how-to-build-a-llama-2-chatbot/)!')
+# Initialize session state for API key
+if "api_key" not in st.session_state:
+    st.session_state.api_key = None
 
-# Store LLM generated responses
-if "messages" not in st.session_state.keys():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+# Prompt for API key only if not already provided
+if not st.session_state.api_key:
+    st.sidebar.subheader("Enter OpenAI API Key")
+    api_key_input = st.sidebar.text_input("API Key:", type="password")
+    if st.sidebar.button("Submit"):
+        if api_key_input:
+            st.session_state.api_key = api_key_input
+            st.sidebar.success("API Key saved!")
+        else:
+            st.sidebar.error("Please enter a valid API key.")
 
-bot_icon = "./michelin_mobility_intelligence_logo.jpeg"  
+# Ensure API key is available before proceeding
+if not st.session_state.api_key:
+    st.warning("Please provide your OpenAI API key in the sidebar to use the application.")
+else:
+    # Use the stored API key
+    api_key = st.session_state.api_key
 
-# Display or clear chat messages
-for message in st.session_state.messages:
-    if message["role"] == "user":
+    # Load data
+    df_crash = pd.read_csv("/Users/sevinchnoori/Michelin4/processed_data/crash_data.csv")
+    df_acceleration = pd.read_csv("/Users/sevinchnoori/Michelin4/processed_data/harsh_accel_data.csv")
+    df_braking = pd.read_csv("/Users/sevinchnoori/Michelin4/processed_data/harsh_braking_data.csv")
+
+    # Tool: Calculate Distance
+    @tool
+    def calculate_distance(lat1: float, lon1: float) -> list[dict]:
+        """
+        Calculate the distance in miles between a given point (lat1, lon1) and 
+        each row's geographic point using the Haversine formula. Add a `distance` column.
+        """
+        df = pd.read_csv("/Users/sevinchnoori/Michelin4/processed_data/crash_data.csv")
+
+        def haversine(row):
+            lat2, lon2 = row['LATITUDE'], row['LONGITUDE']
+            lat1_rad, lon1_rad, lat2_rad, lon2_rad = map(np.radians, [lat1, lon1, lat2, lon2])
+            dlat = lat2_rad - lat1_rad
+            dlon = lon2_rad - lon1_rad
+            a = np.sin(dlat / 2) ** 2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon / 2) ** 2
+            c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+            r = 3963  # Radius of Earth in miles
+            return r * c
+
+        df['distance'] = df.apply(haversine, axis=1)
+        df.to_csv("/Users/sevinchnoori/Michelin4/processed_data/temp.csv")
+        return df
+
+    # Tool: Get Geographic Coordinates
+    @tool
+    def get_geographic_coordinates(placename: str) -> tuple:
+        """
+        Fetch geographic coordinates (latitude and longitude) for a given place name.
+        """
+        try:
+            search = geocoder.geonames(placename, maxRows=1, country='US', adminCode1='CA', adminCode2='037', key='dongim04')
+            latitude = search.lat
+            longitude = search.lng
+            if latitude is None or longitude is None:
+                raise ValueError("Coordinates not found.")
+            return latitude, longitude
+        except Exception as e:
+            print(f"Error fetching coordinates for {placename}: {e}")
+            return None, None
+
+    # Tool: Filter DataFrame
+    @tool
+    def filter_df(conditions: dict) -> list[dict]:
+        """
+        Filter a DataFrame based on multiple conditions from user query provided as a dictionary.
+        example parameter: conditions = {'year': 2020, 'poi_type': 'School'}
+        """
+        df = pd.read_csv("/Users/sevinchnoori/Michelin4/processed_data/crash_data.csv")
+        filtered_df = df.copy()
+        for column, value in conditions.items():
+            if column in filtered_df.columns:
+                filtered_df = filtered_df[filtered_df[column] == value]
+            else:
+                raise ValueError(f"Column '{column}' does not exist in the DataFrame.")
+        return filtered_df
+
+    # CSV Agent Setup
+    csv_agent = create_csv_agent(
+        ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=api_key),
+        path="/Users/sevinchnoori/Michelin4/processed_data/crash_data.csv",
+        verbose=True,
+        agent_type=AgentType.OPENAI_FUNCTIONS,
+        allow_dangerous_code=True,
+        extra_tools=[calculate_distance, get_geographic_coordinates],
+        prefix=(
+            "First filter out necessary rows using appropriate column values (e.g., year, poi_type, etc.). "
+            "Based on the user query, come up with conditions dictionary. For example, conditions = {'year': 2020, 'poi_type': 'School'}"
+            "If necessary, use the `calculate_distance` function to calculate distances between locations. "
+            "Then, use the entire 290887 distance values for calculation afterward. NEVER use sample data. Read csv data from '/Users/sevinchnoori/Michelin4/processed_data/temp.csv'"
+        )
+    )
+
+    # Store chat messages
+    if "messages" not in st.session_state.keys():
+        st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+
+    bot_icon = "./michelin_mobility_intelligence_logo.jpeg"
+
+    # Display or clear chat messages
+    for message in st.session_state.messages:
+        if message["role"] == "user":
+            with st.chat_message("user"):
+                st.write(message["content"])
+        else:
+            with st.chat_message("assistant"):
+                st.image(bot_icon, width=30)  # Display chatbot icon
+                st.write(message["content"])
+
+    def clear_chat_history():
+        st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+    st.sidebar.button("Clear Chat History", on_click=clear_chat_history)
+
+    # User-provided prompt
+    replicate_api = True
+    if prompt := st.chat_input(disabled=not replicate_api):
+        st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
-            # st.image(user_icon, width=30)  # Display user icon
-            st.write(message["content"])    # Show user message
-    else:
-        with st.chat_message("assistant"):
-            st.image(bot_icon, width=30)  # Display chatbot icon
-            st.write(message["content"])
+            st.write(prompt)
 
+    # Generate a new response if the last message is not from the assistant
+    if st.session_state.messages[-1]["role"] != "assistant":
+        with st.spinner("Thinking..."):
+            response = csv_agent.invoke(prompt)
+            placeholder = st.empty()
+            full_response = response.get("output", "")
 
-def clear_chat_history():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
-st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+            if "map" in full_response.lower():
+                data_point = df_crash.iloc[10]  # Use a specific row, e.g., 10th row of the crash data
+                map = Map(data_point)
+                map.marker(data_point, color='blue', icon='road', popup=True)
+                # Assuming the response asks to show a map, we retrieve the map HTML
+                map_html = map.get_map_html()
+                components.html(map_html, height=500)
+            
+            placeholder.markdown(full_response)
+            message = {"role": "assistant", "content": full_response}
+            st.session_state.messages.append(message)
 
-# Function for generating LLaMA2 response. Refactored from https://github.com/a16z-infra/llama2-chatbot
-# def generate_llama2_response(prompt_input):
-#     string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
-#     for dict_message in st.session_state.messages:
-#         if dict_message["role"] == "user":
-#             string_dialogue += "User: " + dict_message["content"] + "\n\n"
-#         else:
-#             string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
-#     output = replicate.run('a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5', 
-#                            input={"prompt": f"{string_dialogue} {prompt_input} Assistant: ",
-#                                   "temperature":temperature, "top_p":top_p, "max_length":max_length, "repetition_penalty":1})
-#     return output
-
-# User-provided prompt
-replicate_api = True  # Temporary fix to enable the input box
-if prompt := st.chat_input(disabled=not replicate_api):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.write(prompt)
-
-# Generate a new response if last message is not from assistant
-# if st.session_state.messages[-1]["role"] != "assistant":
-#         with st.spinner("Thinking..."):
-#             response = generate_llama2_response(prompt)    method generate_llama2_response() replace with openAI metho
-#             placeholder = st.empty()
-#             full_response = ''
-#             for item in response:
-#                 full_response += item
-#                 placeholder.markdown(full_response)
-#             placeholder.markdown(full_response)
-#     message = {"role": "assistant", "content": full_response}
-#     st.session_state.messages.append(message)
