@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_fa726256e3e2341f5ae241454e07ce90 {
+                #map_f6a3a3cacf1f4d404ed45459c0b23011 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -39,18 +39,18 @@
 <body>
     
     
-            <div class="folium-map" id="map_fa726256e3e2341f5ae241454e07ce90" ></div>
+            <div class="folium-map" id="map_f6a3a3cacf1f4d404ed45459c0b23011" ></div>
         
 </body>
 <script>
     
     
-            var map_fa726256e3e2341f5ae241454e07ce90 = L.map(
-                "map_fa726256e3e2341f5ae241454e07ce90",
+            var map_f6a3a3cacf1f4d404ed45459c0b23011 = L.map(
+                "map_f6a3a3cacf1f4d404ed45459c0b23011",
                 {
-                    center: [33.941818237, -118.326698303],
+                    center: [34.070877749999994, -118.44685031405575],
                     crs: L.CRS.EPSG3857,
-                    zoom: 13,
+                    zoom: 15,
                     zoomControl: true,
                     preferCanvas: false,
                 }
@@ -60,37 +60,145 @@
 
         
     
-            var tile_layer_b727466abf648cb5014bc6906f08145f = L.tileLayer(
+            var tile_layer_e9d742e53f75855503b4a0665cbfdf8c = L.tileLayer(
                 "https://tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=yKizQwgQd53rog6n0kisnZ6OhqsNUzcMIhPKV7RLevpkLFUEfGrQbgW8SUl9GwKa",
                 {"attribution": "\u003ca href=\"https://jawg.io\" title=\"Tiles Courtesy of Jawg Maps\" target=\"_blank\"\u003e\u0026copy; \u003cb\u003eJawg\u003c/b\u003eMaps\u003c/a\u003e \u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
             );
         
     
-            tile_layer_b727466abf648cb5014bc6906f08145f.addTo(map_fa726256e3e2341f5ae241454e07ce90);
+            tile_layer_e9d742e53f75855503b4a0665cbfdf8c.addTo(map_f6a3a3cacf1f4d404ed45459c0b23011);
         
     
-            var marker_c9eaf8598e7c46573bd0c30f1d0159ea = L.marker(
-                [33.941818237, -118.326698303],
+            var marker_2799a98adc3c43d20316d05731684a32 = L.marker(
+                [34.068561554, -118.44896698],
                 {}
-            ).addTo(map_fa726256e3e2341f5ae241454e07ce90);
+            ).addTo(map_f6a3a3cacf1f4d404ed45459c0b23011);
         
     
-            var icon_db814bbf6c55d570bd0e6485a0e91705 = L.AwesomeMarkers.icon(
+            var icon_eea4ebe5d02d3de96fe44b1d9a2c9e75 = L.AwesomeMarkers.icon(
                 {"extraClasses": "fa-rotate-0", "icon": "road", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
             );
-            marker_c9eaf8598e7c46573bd0c30f1d0159ea.setIcon(icon_db814bbf6c55d570bd0e6485a0e91705);
+            marker_2799a98adc3c43d20316d05731684a32.setIcon(icon_eea4ebe5d02d3de96fe44b1d9a2c9e75);
         
     
-        var popup_2867196985aa2b69c1629078a9e222b8 = L.popup({"maxWidth": 300, "minWidth": 300});
+        var popup_ae2f194e10deb98a19fc79eb66a3d66e = L.popup({"maxWidth": 300, "minWidth": 300});
 
         
             
-                var html_d9a46f84bfe8d0f3e9f03716f52e0851 = $(`<div id="html_d9a46f84bfe8d0f3e9f03716f52e0851" style="width: 100.0%; height: 100.0%;">Latitude: 33.94<br>Longitude: -118.33<br>Year: 2019<br>Person Involved: VH<br>Injury: NO_INJURY<br>POI Type: shop<br>Distance to POI: 0.31</div>`)[0];
-                popup_2867196985aa2b69c1629078a9e222b8.setContent(html_d9a46f84bfe8d0f3e9f03716f52e0851);
+                var html_f55815041d26cb1bafad0515f29688bc = $(`<div id="html_f55815041d26cb1bafad0515f29688bc" style="width: 100.0%; height: 100.0%;">Latitude: 34.068561554<br>Longitude: -118.44896698<br>Year: 2019<br>POI Type: highway<br>Distance to POI: 0.4511330809772184 miles</div>`)[0];
+                popup_ae2f194e10deb98a19fc79eb66a3d66e.setContent(html_f55815041d26cb1bafad0515f29688bc);
             
         
 
-        marker_c9eaf8598e7c46573bd0c30f1d0159ea.bindPopup(popup_2867196985aa2b69c1629078a9e222b8)
+        marker_2799a98adc3c43d20316d05731684a32.bindPopup(popup_ae2f194e10deb98a19fc79eb66a3d66e)
+        ;
+
+        
+    
+    
+            var marker_9e1360eae5677d1156f8e2d640697d85 = L.marker(
+                [34.068561554, -118.44896698],
+                {}
+            ).addTo(map_f6a3a3cacf1f4d404ed45459c0b23011);
+        
+    
+            var icon_6f35f582d5cc86b0fae61f44bb77d4df = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "road", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_9e1360eae5677d1156f8e2d640697d85.setIcon(icon_6f35f582d5cc86b0fae61f44bb77d4df);
+        
+    
+        var popup_0ebb7f59b7393be35881e455148a3db9 = L.popup({"maxWidth": 300, "minWidth": 300});
+
+        
+            
+                var html_8a9c6273e45432824572fdf450a7cbe8 = $(`<div id="html_8a9c6273e45432824572fdf450a7cbe8" style="width: 100.0%; height: 100.0%;">Latitude: 34.068561554<br>Longitude: -118.44896698<br>Year: 2019<br>POI Type: tourism<br>Distance to POI: 2.228719550596157 miles</div>`)[0];
+                popup_0ebb7f59b7393be35881e455148a3db9.setContent(html_8a9c6273e45432824572fdf450a7cbe8);
+            
+        
+
+        marker_9e1360eae5677d1156f8e2d640697d85.bindPopup(popup_0ebb7f59b7393be35881e455148a3db9)
+        ;
+
+        
+    
+    
+            var marker_d9a3c4ea3b7564760aaa73898286d5fb = L.marker(
+                [34.069068909, -118.449714661],
+                {}
+            ).addTo(map_f6a3a3cacf1f4d404ed45459c0b23011);
+        
+    
+            var icon_e14cea1f2d468338e135b90bfc42775d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "road", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_d9a3c4ea3b7564760aaa73898286d5fb.setIcon(icon_e14cea1f2d468338e135b90bfc42775d);
+        
+    
+        var popup_9317940ecbfe8769c4c9505d0b0b3c7e = L.popup({"maxWidth": 300, "minWidth": 300});
+
+        
+            
+                var html_21a332688e1ba988070e397ef941eaff = $(`<div id="html_21a332688e1ba988070e397ef941eaff" style="width: 100.0%; height: 100.0%;">Latitude: 34.069068909<br>Longitude: -118.449714661<br>Year: 2020<br>POI Type: shop<br>Distance to POI: 1.3248875743987103 miles</div>`)[0];
+                popup_9317940ecbfe8769c4c9505d0b0b3c7e.setContent(html_21a332688e1ba988070e397ef941eaff);
+            
+        
+
+        marker_d9a3c4ea3b7564760aaa73898286d5fb.bindPopup(popup_9317940ecbfe8769c4c9505d0b0b3c7e)
+        ;
+
+        
+    
+    
+            var marker_855ebde573839cd6c20894992cd6325c = L.marker(
+                [34.069068909, -118.449714661],
+                {}
+            ).addTo(map_f6a3a3cacf1f4d404ed45459c0b23011);
+        
+    
+            var icon_6a0f679d4b1da9228db20b7d101cc007 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "road", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_855ebde573839cd6c20894992cd6325c.setIcon(icon_6a0f679d4b1da9228db20b7d101cc007);
+        
+    
+        var popup_58ec3b923426e516a1cb51ada992ad85 = L.popup({"maxWidth": 300, "minWidth": 300});
+
+        
+            
+                var html_097d7c0d0915e3dad5e77fe6835f9dc4 = $(`<div id="html_097d7c0d0915e3dad5e77fe6835f9dc4" style="width: 100.0%; height: 100.0%;">Latitude: 34.069068909<br>Longitude: -118.449714661<br>Year: 2020<br>POI Type: tourism<br>Distance to POI: 1.5095814392915832 miles</div>`)[0];
+                popup_58ec3b923426e516a1cb51ada992ad85.setContent(html_097d7c0d0915e3dad5e77fe6835f9dc4);
+            
+        
+
+        marker_855ebde573839cd6c20894992cd6325c.bindPopup(popup_58ec3b923426e516a1cb51ada992ad85)
+        ;
+
+        
+    
+    
+            var marker_5519f1027ec3f4f0ea0fb98ef53b2eff = L.marker(
+                [34.07378006, -118.445343018],
+                {}
+            ).addTo(map_f6a3a3cacf1f4d404ed45459c0b23011);
+        
+    
+            var icon_3f4f1a08ddf326057a80d3ca6f261fb4 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "road", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_5519f1027ec3f4f0ea0fb98ef53b2eff.setIcon(icon_3f4f1a08ddf326057a80d3ca6f261fb4);
+        
+    
+        var popup_e864988186a422647632c12b5ac70749 = L.popup({"maxWidth": 300, "minWidth": 300});
+
+        
+            
+                var html_bba8452c471ea159f03a9405ddd8845c = $(`<div id="html_bba8452c471ea159f03a9405ddd8845c" style="width: 100.0%; height: 100.0%;">Latitude: 34.07378006<br>Longitude: -118.445343018<br>Year: 2018<br>POI Type: shop<br>Distance to POI: 2.012478940209511 miles</div>`)[0];
+                popup_e864988186a422647632c12b5ac70749.setContent(html_bba8452c471ea159f03a9405ddd8845c);
+            
+        
+
+        marker_5519f1027ec3f4f0ea0fb98ef53b2eff.bindPopup(popup_e864988186a422647632c12b5ac70749)
         ;
 
         
